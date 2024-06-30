@@ -32,6 +32,11 @@ public class ProfileController {
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<?> getProfileByName(@PathVariable String name) {
+        return new ResponseEntity<>(profileService.getProfileByName(name), HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<?> createProfile(@RequestBody Profile profile) {
         Profile existingProfile = profileService.getProfileByName(profile.getName());

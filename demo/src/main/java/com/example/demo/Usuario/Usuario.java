@@ -29,7 +29,7 @@ public class Usuario {
     private String password;
 
     @ManyToOne
-    @JoinColumn(name = "profile_id", nullable = false)
+    @JoinColumn(name = "profile_id", nullable = true)
     private Profile profile;
 
     public Long getId() {

@@ -1,7 +1,10 @@
 package com.example.demo.Usuario;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,5 +27,13 @@ public class UsuarioService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public Page<Usuario> findUsers(String search, Pageable pageable) {
+        if (search == null || search.isEmpty()) {
+            return userRepository.findAll(pageable);
+        } else {
+            return userRepository.findUsersBySearch(search, pageable);
+        }
     }
 }
