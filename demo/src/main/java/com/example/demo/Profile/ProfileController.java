@@ -15,41 +15,50 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/Profile")
+@RequestMapping("api/profile")
 public class ProfileController {
     @Autowired
-    private ProfileService ProfileService;
+    private ProfileService profileService;
 
     @GetMapping
     public List<Profile> getAllProfile() {
-        return ProfileService.getAllProfiles();
+        return profileService.getAllProfiles();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Profile> getProfileById(@PathVariable Long id) {
-        Profile profile = ProfileService.getProfileById(id);
-        return profile != null ? new ResponseEntity<>(profile, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Profile profile = profileService.getProfileById(id);
+        return profile != null ? new ResponseEntity<>(profile, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    public Profile createProfile(@RequestBody Profile profile) {
-        return ProfileService.saveProfile(profile);
+    public ResponseEntity<?> createProfile(@RequestBody Profile profile) {
+        Profile existingProfile = profileService.getProfileByName(profile.getName());
+        if (existingProfile != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("O perfil com o nome " + profile.getName() + " já existe.");
+        }
+
+        Profile savedProfile = profileService.saveProfile(profile);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProfile);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profile) {
-        Profile existingProfile = ProfileService.getProfileById(id);
-        if (existingProfile != null) {
-            profile.setId(id);
-            return new ResponseEntity<>(ProfileService.saveProfile(profile), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> updateProfile(@PathVariable Long id, @RequestBody Profile profile) {
+        Profile existingProfile = profileService.getProfileByName(profile.getName());
+        if (existingProfile != null && !existingProfile.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("O perfil com o nome " + profile.getName() + " já existe.");
         }
+
+        profile.setId(id);
+        return new ResponseEntity<>(profileService.saveProfile(profile), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
-        ProfileService.deleteProfile(id);
+        profileService.deleteProfile(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

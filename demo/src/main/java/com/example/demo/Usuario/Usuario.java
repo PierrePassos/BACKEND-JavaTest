@@ -1,6 +1,6 @@
-package com.example.demo.User;
+package com.example.demo.Usuario;
 
-import org.springframework.context.annotation.Profile;
+import com.example.demo.Profile.Profile;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,22 +9,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
-public class User {
+@Table(name = "usuario")
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome", nullable = false, length = 50)
-    private String nome;
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "senha", nullable = false, length = 250)
-    private String senha;
+    @Column(name = "password", nullable = false, length = 250)
+    private String password;
 
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
@@ -38,12 +40,12 @@ public class User {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -54,12 +56,12 @@ public class User {
         this.email = email;
     }
 
-    public String getSenha() {
-        return senha;
+    public String getPassword() {
+        return password;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Profile getProfile() {
@@ -69,7 +71,5 @@ public class User {
     public void setProfile(Profile profile) {
         this.profile = profile;
     }
-
-   
 
 }

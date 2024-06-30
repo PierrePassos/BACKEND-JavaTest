@@ -1,8 +1,10 @@
 package com.example.demo.Profile;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,7 +13,13 @@ public class ProfileService {
     private ProfileRepository profileRepository;
 
     public List<Profile> getAllProfiles() {
-        return profileRepository.findAll();
+        Sort sortByIdAsc = Sort.by(Sort.Direction.ASC, "id");
+        return profileRepository.findAll(sortByIdAsc);
+    }
+
+    public Profile getProfileByName(String name) {
+        Optional<Profile> optionalProfile = profileRepository.findByName(name);
+        return optionalProfile.orElse(null);
     }
 
     public Profile getProfileById(Long id) {

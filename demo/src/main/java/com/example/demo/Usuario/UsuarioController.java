@@ -1,4 +1,4 @@
-package com.example.demo.User;
+package com.example.demo.Usuario;
 
 import java.util.List;
 
@@ -14,34 +14,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.Profile.Profile;
+// import com.example.demo.Profile.Profile;
 
 @RestController
 @RequestMapping("api/user")
-public class UserController {
+public class UsuarioController {
     @Autowired
-    private UserService userService;
+    private UsuarioService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<Usuario> getAllUser() {
+        return userService.getAllUser();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+    public ResponseEntity<Usuario> getUserById(@PathVariable Long id) {
+        Usuario user = userService.getUserById(id);
         return user != null ? new ResponseEntity<>(user, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public Usuario createUser(@RequestBody Usuario user) {
         // Profile profile = profileService.getProfileById(user.getProfile().getId());
         // user.setProfile(profile);
         return userService.saveUser(user);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User existingUser = userService.getUserById(id);
+    public ResponseEntity<Usuario> updateUser(@PathVariable Long id, @RequestBody Usuario user) {
+        Usuario existingUser = userService.getUserById(id);
         if (existingUser != null) {
             user.setId(id);
             return new ResponseEntity<>(userService.saveUser(user), HttpStatus.OK);

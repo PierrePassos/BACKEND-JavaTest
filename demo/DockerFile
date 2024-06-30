@@ -1,0 +1,11 @@
+# Usa a imagem OpenJDK 17 como base
+FROM openjdk:17-jdk-alpine
+
+# Configura o diretório de trabalho
+WORKDIR /app
+
+# Copia o arquivo WAR para o container
+COPY target/demo-0.0.1-SNAPSHOT.war app.war
+
+# Comando para executar a aplicação quando o container for iniciado
+CMD ["java", "-jar", "app.war"]
