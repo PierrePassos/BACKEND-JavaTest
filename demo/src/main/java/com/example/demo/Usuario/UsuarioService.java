@@ -30,10 +30,10 @@ public class UsuarioService {
     }
 
     public Page<Usuario> findUsers(String search, Pageable pageable) {
-        if (search == null || search.isEmpty()) {
-            return userRepository.findAll(pageable);
-        } else {
-            return userRepository.findUsersBySearch(search, pageable);
-        }
+        return userRepository.findUsersBySearch(search, pageable);
+    }
+
+    public Usuario getByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

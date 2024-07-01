@@ -3,6 +3,7 @@ package com.example.demo.Usuario;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-// import com.example.demo.Profile.Profile;
+import com.example.demo.Service.PasswordEncryptionService;
 
 @RestController
 @RequestMapping("api/user")
@@ -36,14 +37,34 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> getUserById(@PathVariable Long id) {
         Usuario user = userService.getUserById(id);
-        return user != null ? new ResponseEntity<>(user, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (user != null) {
+            user = skipPassword(user);
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public Usuario createUser(@RequestBody Usuario user) {
-        // Profile profile = profileService.getProfileById(user.getProfile().getId());
-        // user.setProfile(profile);
-        return userService.saveUser(user);
+    public ResponseEntity<?> createUser(@RequestBody Usuario user) {
+        String password = user.getPassword();
+        System.out.println("Usuário antes de salvar: " + user.toString());
+
+        try {
+            String passwordEncrypted = PasswordEncryptionService.encryptPassword(password);
+            System.out.println(passwordEncrypted);
+
+            if (passwordEncrypted != null) {
+                user.setPassword(passwordEncrypted);
+                Usuario savedUser = userService.saveUser(user);
+                return new ResponseEntity<>(savedUser, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Erro ao salvar usuário, senha vazia", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Erro ao salvar usuário", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
@@ -69,18 +90,24 @@ public class UsuarioController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "search", defaultValue = "") String search) {
 
-        System.out.println("Received request with parameters:");
-        System.out.println("page: " + page);
-        System.out.println("size: " + size);
-        System.out.println("search: " + search);
-
         Pageable pageable = PageRequest.of(page, size);
         Page<Usuario> users = userService.findUsers(search, pageable);
         Map<String, Object> response = new HashMap<>();
-        response.put("users", users.getContent());
+        response.put("users", this.skipPassword(users.getContent()));
         response.put("total", users.getTotalElements());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public List<Usuario> skipPassword(List<Usuario> users) {
+        return users.stream()
+                .peek(user -> user.setPassword(null))
+                .collect(Collectors.toList());
+    }
+
+    public Usuario skipPassword(Usuario user) {
+        user.setPassword(null);
+        return user;
     }
 
 }

@@ -61,9 +61,11 @@ public class ProfileController {
         return new ResponseEntity<>(profileService.saveProfile(profile), HttpStatus.OK);
     }
 
+    //Profile só pode ser deletado se não estiver referenciado em nenhum Usuario.
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
         profileService.deleteProfile(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    
 }
